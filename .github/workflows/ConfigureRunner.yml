@@ -1,0 +1,161 @@
+name: ConfigureRunner
+
+on:
+  workflow_dispatch: 
+  
+   inputs:          
+        Execution_Environment:
+          description: 'Execution Environment'
+          default: 'NON-PROD'
+          required: true
+          type: string
+  
+  #schedule:
+  #- cron: '1/15 * * * *' 
+
+jobs:
+  triggerAutomationTest:
+
+    #runs-on:  [btwn004863, self-hosted, telus-org-runner]
+    #runs-on: ubuntu-latest
+    runs-on: self-hosted
+    environment: ${{ github.event.inputs.Execution_Environment }}
+    
+    env:
+        #Token Related Info
+        GH_READ_PACKAGES_TOKEN: ${{ secrets.GH_READ_PACKAGES_TOKEN }}
+        TESTING_USER: ${{ secrets.TESTING_USER }} 
+        GH_CD_RT: ${{ secrets.GH_CD_RT }}
+        GH_CS_RT: ${{ secrets.GH_CS_RT }}
+        GH_RT: ${{ secrets.GH_RT }}
+        GSHEET_ID: ${{ secrets.GSHEET_ID }}
+        USERACCESS: ${{ secrets.USERACCESS }}
+        TESTDATA: ${{ secrets.TD_CLECOSS }}
+        #Application Username(s) and Password(s)
+        APPIAN_PASSWORD: ${{ secrets.APPIAN_PASSWORD }}
+        APPIAN_USERNAME: ${{ secrets.APPIAN_USERNAME }}
+        ART_PASSWORD: ${{ secrets.ART_PASSWORD }}
+        ART_USERNAME: ${{ secrets.ART_USERNAME }}
+        BLIF_PASSWORD: ${{ secrets.BLIF_PASSWORD }}
+        BLIF_USERNAME: ${{ secrets.BLIF_USERNAME }}
+        BRS_PASSWORD: ${{ secrets.BRS_PASSWORD }}
+        BRS_USERNAME: ${{ secrets.BRS_USERNAME }}
+        CAM_PASSWORD: ${{ secrets.CAM_PASSWORD }}
+        CAM_USERNAME: ${{ secrets.CAM_USERNAME }}
+        IVS2-INTERNAL_PASSWORD: ${{ secrets.IVS2_INTERNAL_PASSWORD }}
+        IVS2-INTERNAL_USERNAME: ${{ secrets.IVS2_INTERNAL_USERNAME }}
+        LDORS_PASSWORD: ${{ secrets.LDORS_PASSWORD }}
+        LDORS_USERNAME: ${{ secrets.LDORS_USERNAME }}
+        REX_PASSWORD: ${{ secrets.REX_PASSWORD }}
+        REX_USERNAME: ${{ secrets.REX_USERNAME }}
+        VPOP-INTERNAL_PASSWORD: ${{ secrets.VPOP_INTERNAL_PASSWORD }}
+        VPOP-INTERNAL_USERNAME: ${{ secrets.VPOP_INTERNAL_USERNAME }}
+        VPOP-EXTERNAL_PASSWORD: ${{ secrets.VPOP_EXTERNAL_PASSWORD }}
+        VPOP-EXTERNAL_USERNAME: ${{ secrets.VPOP_EXTERNAL_USERNAME }}
+        RRW_PASSWORD: ${{ secrets.RRW_PASSWORD }}
+        RRW_USERNAME: ${{ secrets.RRW_USERNAME }}
+        LEGACY-IVS_PASSWORD: ${{ secrets.LEGACY_IVS_PASSWORD }}
+        LEGACY-IVS_USERNAME: ${{ secrets.LEGACY_IVS_USERNAME }}
+        CONTRACT-SUITE_PASSWORD: ${{ secrets.CONTRACT_SUITE_PASSWORD }}
+        CONTRACT-SUITE_USERNAME: ${{ secrets.CONTRACT_SUITE_USERNAME }}
+        TLC_PASSWORD: ${{ secrets.TLC_PASSWORD }}
+        TLC_USERNAME: ${{ secrets.TLC_USERNAME }}
+        HUMBOLDT_PASSWORD: ${{ secrets.HUMBOLDT_PASSWORD }}
+        HUMBOLDT_USERNAME: ${{ secrets.HUMBOLDT_USERNAME }}
+        LSR_PASSWORD: ${{ secrets.LSR_PASSWORD }}
+        LSR_USERNAME: ${{ secrets.LSR_USERNAME }}
+        ControlM_PASSWORD: ${{ secrets.CONTROLM_PASSWORD }}
+        ControlM_USERNAME: ${{ secrets.CONTROLM_USERNAME }}
+        IVS2-EXTERNAL_PASSWORD: ${{ secrets.IVS2_EXTERNAL_PASSWORD }}
+        IVS2-EXTERNAL_USERNAME: ${{ secrets.IVS2_EXTERNAL_USERNAME }}
+        ECB_PASSWORD: ${{ secrets.ECB_PASSWORD }}
+        ECB_USERNAME: ${{ secrets.ECB_USERNAME }}
+        XML-GATEWAY_PASSWORD: ${{ secrets.APPIAN_PASSWORD }}
+        XML-GATEWAY_USERNAME: ${{ secrets.APPIAN_PASSWORD }}
+        ORDERINQUIRY_PASSWORD: ${{ secrets.ORDERINQUIRY_PASSWORD }}
+        ORDERINQUIRY_USERNAME: ${{ secrets.ORDERINQUIRY_USERNAME }}
+        CUSTOMERFULFILLMENT_PASSWORD: ${{ secrets.CUSTOMERFULFILLMENT_PASSWORD }}
+        CUSTOMERFULFILLMENT_USERNAME: ${{ secrets.CUSTOMERFULFILLMENT_USERNAME }}
+        WFMA_PASSWORD: ${{ secrets.WFMA_PASSWORD }}
+        WFMA_USERNAME: ${{ secrets.WFMA_USERNAME }}
+        OCP1_PASSWORD: ${{ secrets.APPIAN_PASSWORD }}
+        OCP1_USERNAME: ${{ secrets.APPIAN_PASSWORD }}
+        OCP2_PASSWORD: ${{ secrets.APPIAN_PASSWORD }}
+        OCP2_USERNAME: ${{ secrets.APPIAN_PASSWORD }}
+        OREDERRESOLUTIONTEAM_PASSWORD: ${{ secrets.APPIAN_PASSWORD }}
+        OREDERRESOLUTIONTEAM_USERNAME: ${{ secrets.APPIAN_PASSWORD }}
+        DYNATRACE_PASSWORD: ${{ secrets.DYNATRACE_PASSWORD }}
+        DYNATRACE_USERNAME: ${{ secrets.DYNATRACE_USERNAME }}
+        OST_PASSWORD: ${{ secrets.OST_PASSWORD }}
+        OST_USERNAME: ${{ secrets.OST_USERNAME }}
+        CSBA_PASSWORD: ${{ secrets.CSBA_PASSWORD }}
+        CSBA_USERNAME: ${{ secrets.CSBA_USERNAME }}
+        CSOM_PASSWORD: ${{ secrets.CSOM_PASSWORD }}
+        CSOM_USERNAME: ${{ secrets.CSOM_USERNAME }}
+        KBP_PASSWORD: ${{ secrets.KBP_PASSWORD }}
+        KBP_USERNAME: ${{ secrets.KBP_USERNAME }}
+        SOAPCMS_PASSWORD: ${{ secrets.SOAPCMS_PASSWORD }}
+        SOAPCMS_USERNAME: ${{ secrets.SOAPCMS_USERNAME }}
+        TOLLFREEORDERSTATUS_PASSWORD: ${{ secrets.TOLLFREEORDERSTATUS_PASSWORD }}
+        TOLLFREEORDERSTATUS_USERNAME: ${{ secrets.TOLLFREEORDERSTATUS_USERNAME }}
+        TPX_AB_IMSE_APP_PASSWORD: ${{ secrets.TPX_AB_IMSE_APP_PASSWORD }}
+        TPX_AB_IMSE_APP_USERNAME: ${{ secrets.TPX_AB_IMSE_APP_USERNAME }}
+        TPX_AB_IMSE_ENV_PASSWORD: ${{ secrets.TPX_AB_IMSE_ENV_PASSWORD }}
+        TPX_AB_IMSE_ENV_USERNAME: ${{ secrets.TPX_AB_IMSE_ENV_USERNAME }}
+        #Application Test Data
+        CMS_CUSTOMER_ID_TD: ${{ secrets.CMS_CUSTOMER_ID_TD }}
+        IVS2_SEARCH_TD: ${{ secrets.IVS2_SEARCH_TD }}
+        LSR_SEARCH_TD: ${{ secrets.LSR_SEARCH_TD }}
+        HUMBOLDT_CONTRACT_NUMBER_TD: ${{ secrets.HUMBOLDT_CONTRACT_NUMBER_TD }}
+        ORDERINQUIRY_ORDERNUMBER_TD: ${{ secrets.ORDERINQUIRY_ORDERNUMBER_TD }}
+        CLECOSS_TD: ${{ secrets.CLECOSS_TD }}
+        CSOM_TD: ${{ secrets.CSOM_TD }}
+
+        
+    
+    steps:
+    - uses: actions/checkout@v3
+      with:
+          ref: gh_actions_feature
+    - name: Set up Maven
+      uses: stCarolas/setup-maven@v4.5
+      with:
+       maven-version: 3.8.2
+    - name: Set up JDK 11
+      uses: actions/setup-java@v3
+      with:
+        java-version: 11
+        distribution: temurin
+     
+   # - name: Build with Maven
+      #run: mvn --settings ./settings.xml -B package --file pom.xml   
+    #- name: install dependencies
+     # run: mvn -B install --no-transfer-progress --quiet
+     
+    
+    - name: Run tests        
+      #run: mvn --settings ./settings.xml -B test package --file pom.xml
+      #run: mvn clean test -Dexecution.environment='NON-PROD' -Dselenium.browser='Chrome' -Ddataproviderthreadcount=1 -Dureport.launch='TestGHA'
+      #run: mvn --settings ./settingss.xml -B test package --file pom.xml -DclientId='${{ secrets.GH_CD_RT }}' -DclientSecret='${{ secrets.GH_CS_RT }}' -DclientToken='${{ secrets.GH_RT }}' -Dcucumber.filter.tags='@BLIF' -Dthreadcount=4
+      run: mvn --settings ./settingss.xml -B test package --file pom.xml -DclientId='${{ secrets.GH_CD_RT }}' -DclientSecret='${{ secrets.GH_CS_RT }}' -DclientToken='${{ secrets.GH_RT }}'
+
+      #run: mvn --settings ./settingss.xml -B test package --file pom.xml -DargLine="-Dexecution.environment=NON-PROD -Dselenium.browser=Chrome -Ddataproviderthreadcount=1 -Dureport.launch=TestGHA"
+    
+    - name: Attach HTML Extent Report
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+          name: Automation-Report
+          path: "target/extent-reports.zip"
+    
+  analize:
+    if: always()
+    name: Analize test result
+    runs-on: windows-latest
+    needs: [triggerAutomationTest]
+     
+    steps:
+      - name: Download Automation-Report.html
+        uses: actions/download-artifact@v3
+        with:
+          name: Automation-Report

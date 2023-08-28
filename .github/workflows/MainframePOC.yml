@@ -1,0 +1,77 @@
+name: MainframePOC
+
+on:
+  workflow_dispatch: 
+  
+   inputs:          
+        Execution_Environment:
+          description: 'Execution Environment'
+          default: 'NON-PROD'
+          required: true
+          type: string
+  
+  #schedule:
+  #- cron: '1/15 * * * *' 
+
+jobs:
+  triggerAutomationTest:
+
+    #runs-on:  [self-hosted, telus-org-runner]
+    #runs-on: ubuntu-latest
+    runs-on: btwn004863
+    environment: ${{ github.event.inputs.Execution_Environment }}
+    
+    env:
+        #Token Related Info
+        GH_READ_PACKAGES_TOKEN: ${{ secrets.GH_READ_PACKAGES_TOKEN }}
+        GH_KEY: ${{ secrets.GH_KEY_STR }}
+        TESTING_USER: ${{ secrets.TESTING_USER }} 
+        GH_CD_RT: ${{ secrets.GH_CD_RT }}
+        GH_CS_RT: ${{ secrets.GH_CS_RT }}
+        GH_RT: ${{ secrets.GH_RT }}       
+    
+    steps:
+    - uses: actions/checkout@v3
+      with:
+          ref: main
+    - name: Set up Maven
+      uses: stCarolas/setup-maven@v4.5
+      with:
+       maven-version: 3.8.2
+    - name: Set up JDK 11
+      uses: actions/setup-java@v3
+      with:
+        java-version: 11
+        distribution: temurin
+     
+   # - name: Build with Maven
+      #run: mvn --settings ./settings.xml -B package --file pom.xml   
+    #- name: install dependencies
+     # run: mvn -B install --no-transfer-progress --quiet
+     
+    
+    - name: Run tests        
+      #run: mvn --settings ./settings.xml -B test package --file pom.xml
+      #run: mvn clean test -Dexecution.environment='NON-PROD' -Dselenium.browser='Chrome' -Ddataproviderthreadcount=1 -Dureport.launch='TestGHA'  -Dcucumber.options="--tags @Mainframe" -Ddataproviderthreadcount=4
+      run: mvn --settings ./settingss.xml -B test package --file pom.xml -DclientId='${{ secrets.GH_CD_RT }}' -DclientSecret='${{ secrets.GH_CS_RT }}' -DclientToken='${{ secrets.GH_RT }}' -Dselenium.ghpt='${{ secrets.GH_READ_PACKAGES_TOKEN }}' -Dselenium.key='${{ secrets.GH_KEY }}' 
+      
+      #run: mvn --settings ./settingss.xml -B test package --file pom.xml -DargLine="-Dexecution.environment=NON-PROD -Dselenium.browser=Chrome -Ddataproviderthreadcount=1 -Dureport.launch=TestGHA"
+    
+    - name: Attach HTML Extent Report
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+          name: Automation-Report
+          path: "target/extent-reports.zip"
+    
+  analize:
+    if: always()
+    name: Analize test result
+    runs-on: windows-latest
+    needs: [triggerAutomationTest]
+     
+    steps:
+      - name: Download Automation-Report.html
+        uses: actions/download-artifact@v3
+        with:
+          name: Automation-Report

@@ -1,0 +1,105 @@
+name: Workflow_Demo_all_main
+
+on:
+  #push:
+   # branches: [ "gh_actions_feature" ]
+  workflow_dispatch: 
+  
+  #schedule:
+  #- cron: '1/15 * * * *'             
+  
+   inputs:          
+        environment:
+          description: 'Execution Environment'
+          default: 'NON-PROD'
+          required: true
+          type: string
+          
+        executionTag:
+          description: 'Execution Tags'
+          default: 'ALLAPPS'
+          required: true
+          type: string
+          
+        threadCount:
+          description: 'Thread Count'
+          default: '4'
+          required: true
+          type: string
+          
+        retryCount:
+          description: 'Retry Count'
+          default: '0'
+          required: true
+          type: string
+          
+        uReportLaunchName:
+          description: 'uReport Launch Name'
+          default: 'DryRunLaunch'
+          required: true
+          type: string   
+
+jobs:
+  triggerAutomationTest:
+
+    #runs-on:  [self-hosted, telus-org-runner]
+    #runs-on: ubuntu-latest
+    runs-on: windows-latest
+    
+    env:
+        GH_READ_PACKAGES_TOKEN: ${{ secrets.GH_READ_PACKAGES_TOKEN }}
+        TESTING_USER: ${{ secrets.TESTING_USER }} 
+        GH_CD_RT: ${{ secrets.GH_CD_RT }}
+        GH_CS_RT: ${{ secrets.GH_CS_RT }}
+        GH_RT: ${{ secrets.GH_RT }}
+        USERACCESS: ${{ secrets.USERACCESS }}
+    
+
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+          ref: main
+    - name: Set up Maven
+      uses: stCarolas/setup-maven@v4.5
+      with:
+       maven-version: 3.8.2
+    - name: Set up JDK 11
+      uses: actions/setup-java@v3
+      with:
+        java-version: 11
+        distribution: temurin
+     
+   # - name: Build with Maven
+      #run: mvn --settings ./settings.xml -B package --file pom.xml   
+    #- name: install dependencies
+     # run: mvn -B install --no-transfer-progress --quiet
+     
+    
+    - name: Run tests        
+      #run: mvn --settings ./settings.xml -B test -DexecutionType=RORGP -Dwebdriver.chrome.driver=/home/batch_vm/actions-runner-2/chromedriver -Dexecution.environment=ITN02 -DNCID=333003 -DUserName=x249799 -DPassword=MY_SECRET1${{ env.MY_SECRET1 }}
+      #run: mvn --settings ./settings.xml -B -Dmaven.test.failure.ignore=false -Dselenium.browser.options=P_HEADLESS_ALONE -DexecutionType=RORGP -Dexecution.environment=ITN02 -DNCID=333003 -DUserName=x249799 -DPassword=${{ env.MY_SECRET1 }} package --file pom.xml test
+      #run: mvn --settings ./settings.xml -B package --file pom.xml test
+      #run: mvn --settings ./settings.xml -B -Dexecution.environment=NON-PROD -Dcucumber.filter.tags=@ALLAPPS -Ddataproviderthreadcount=1 package --file pom.xml test
+      #run: mvn --settings ./settings.xml -B -Dexecution.environment=${{ github.event.inputs.environment }} -Dcucumber.filter.tags=${{ github.event.inputs.executionTag }} -Ddataproviderthreadcount=${{ github.event.inputs.threadCount }} -Dretry.testng=${{ github.event.inputs.retryCount }} -Dureport.launch=${{ github.event.inputs.uReportLaunchName }} --file pom.xml test
+      run: mvn --settings ./settings.xml -B test package --file pom.xml 
+    
+    
+    - name: Attach HTML Extent Report
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+          name: Automation-Report
+          path: "target/extent-reports.zip"
+    
+  analize:
+    if: always()
+    name: Analize test result
+    runs-on: windows-latest
+    needs: [triggerAutomationTest]
+     
+    steps:
+      - name: Download Automation-Report.html
+        uses: actions/download-artifact@v3
+        with:
+          name: Automation-Report
